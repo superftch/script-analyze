@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import * as fs from "fs";
-import { dirname, extname } from "path";
+import { dirname, extname, join } from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
 import { defineArgs, print, printProgress } from "./helper.js";
@@ -19,14 +19,14 @@ const search = key;
  *
  * @return {Promise<void>}
  */
-const init = async (path, allowExt, search) => {
+const execute = async (path, allowExt, search) => {
   const data = [];
 
   // Ambil file include
   await walkRead(path, allowExt, search, data);
 
   if (data.length > 0) {
-    const localPath = dirname(fileURLToPath(import.meta.url));
+    const localPath = join(dirname(fileURLToPath(import.meta.url)), "..");
     let exportedPath = localPath + "/exported";
     let isDirExist = fs.existsSync(exportedPath);
 
@@ -60,7 +60,7 @@ const init = async (path, allowExt, search) => {
         exportedPath + "/detail.json",
         JSON.stringify(data, null, 2)
       );
-      fs.writeFileSync(exportedPath + "/path.txt", paths);
+      fs.writeFileSync(exportedPath + "/file.txt", paths);
     }
 
     print.success(
@@ -135,4 +135,6 @@ const walkRead = async (path, allowExt, search, exported) => {
   }
 };
 
-init(path, allowExt, search);
+export const initialize = () => {
+  execute(path, allowExt, search);
+};
