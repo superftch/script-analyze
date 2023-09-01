@@ -11,6 +11,14 @@ defineArgs("!key", "!path", "!allowExt", "output");
 
 const search = key;
 
+/**
+ *
+ * @param {string} path
+ * @param {string} allowExt
+ * @param {string} search
+ *
+ * @return {Promise<void>}
+ */
 const init = async (path, allowExt, search) => {
   const data = [];
 
@@ -34,6 +42,7 @@ const init = async (path, allowExt, search) => {
       })
       .join("\n");
 
+    // Buat direktori baru
     if (output) {
       exportedPath = exportedPath + "/" + output;
     } else {
@@ -44,6 +53,7 @@ const init = async (path, allowExt, search) => {
 
     isDirExist = fs.existsSync(exportedPath);
 
+    // Export menjadi text dan json
     if (!isDirExist) {
       await fs.promises.mkdir(exportedPath);
       fs.writeFileSync(
@@ -61,6 +71,15 @@ const init = async (path, allowExt, search) => {
   }
 };
 
+/**
+ *
+ * @param {string} path
+ * @param {string} allowExt
+ * @param {string} search
+ * @param {Array<Object>} exported
+ *
+ * @return {Promise<void>}
+ */
 const walkRead = async (path, allowExt, search, exported) => {
   const filePaths = fs.readdirSync(path);
   for await (let filePath of filePaths) {
@@ -79,6 +98,7 @@ const walkRead = async (path, allowExt, search, exported) => {
           chalk.blue("Analyze file " + filePath.replace("../", ""))
         );
 
+        // Baca file
         const fileStream = fs.createReadStream(filePath);
         const lines = readline.createInterface({
           input: fileStream,

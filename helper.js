@@ -82,7 +82,7 @@ export const defineArgs = (...args) => {
     });
 
     if (isRequired && (global[arg] == "" || !global[arg])) {
-      print.error(`Parameter ${arg} tidak boleh kosong!`);
+      print.error(`The ${arg} argument cannot be empty!`);
       process.exit(1);
     }
   });
