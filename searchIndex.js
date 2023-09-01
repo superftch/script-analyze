@@ -7,21 +7,9 @@ import { defineArgs, print, printProgress } from "./helper.js";
 
 process.stdout.write("\x1Bc");
 
-defineArgs("key", "path", "allowExt", "output");
+defineArgs("!key", "!path", "!allowExt", "output");
 
 const search = key;
-
-if (search == "" || !search) {
-  throw new Error("Parameter search tidak boleh kosong!");
-}
-
-if (path == "" || !path) {
-  throw new Error("Parameter path tidak boleh kosong!");
-}
-
-if (allowExt == "" || !allowExt) {
-  throw new Error("Parameter allowExt tidak boleh kosong!");
-}
 
 const init = async (path, allowExt, search) => {
   const data = [];
@@ -111,7 +99,7 @@ const walkRead = async (path, allowExt, search, exported) => {
             const detail = {};
             detail.line = index;
             detail.search = search;
-            detail.content = `Line ${index}: ${line.trim()}`;
+            detail.content = line.trim();
             data.details.push(detail);
           }
 

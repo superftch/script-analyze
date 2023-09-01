@@ -47,6 +47,15 @@ export const print = {
   warn: (...args) => {
     console.info(chalk.yellow(...args));
   },
+
+  /**
+   *
+   * @param {Array<Object>} args
+   * @return {void}
+   */
+  error: (...args) => {
+    console.error(chalk.redBright(...args));
+  },
 };
 
 /**
@@ -59,7 +68,10 @@ export const defineArgs = (...args) => {
   const result = {};
 
   args.forEach((arg) => {
+    const isRequired = arg.includes("!");
+
     global[arg] = undefined;
+    arg = arg.replace("!", "");
     argv.forEach((argvItem) => {
       if (argvItem.includes(arg)) {
         const [_, value] = argvItem.split("=");
@@ -68,6 +80,11 @@ export const defineArgs = (...args) => {
         print.default(arg + ": " + value);
       }
     });
+
+    if (isRequired && (global[arg] == "" || !global[arg])) {
+      print.error(`Parameter ${arg} tidak boleh kosong!`);
+      process.exit(1);
+    }
   });
 
   return result;
