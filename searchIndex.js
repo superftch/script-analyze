@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import * as fs from "fs";
 import { dirname, extname } from "path";
 import readline from "readline";
@@ -71,6 +72,12 @@ const init = async (path, allowExt, search) => {
     );
     fs.writeFileSync(exportedPath + "/path.txt", paths);
   }
+
+  if (data.length > 0) {
+    console.info(chalk.green("Successfully exported " + data.length + " line"));
+  } else {
+    console.warning(chalk.yellow("Index not found!"));
+  }
 };
 
 const walkRead = async (path, allowExt, search, exported) => {
@@ -87,6 +94,10 @@ const walkRead = async (path, allowExt, search, exported) => {
       const extName = extname(originalPath);
       // Jika file extension sesuai
       if (extName.includes(allowExt) && extName !== "") {
+        console.info(
+          chalk.blue("Found index in " + filePath.replace("../", ""))
+        );
+
         const fileStream = fs.createReadStream(filePath);
         const lines = readline.createInterface({
           input: fileStream,
