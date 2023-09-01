@@ -8,7 +8,7 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "postinstall": "npm link"
+    "postinstall": "npm link commander"
   },
   "keywords": [],
   "author": "",
