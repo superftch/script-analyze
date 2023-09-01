@@ -3,22 +3,13 @@ import * as fs from "fs";
 import { dirname, extname } from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
+import { defineArgs, print, printProgress } from "./helper.js";
 
-const { argv } = process;
+process.stdout.write("\x1Bc");
 
-const args = argv.filter((arg) => {
-  return (
-    arg.indexOf("key") > -1 ||
-    arg.indexOf("path") > -1 ||
-    arg.indexOf("allowExt") > -1 ||
-    arg.indexOf("output") > -1
-  );
-});
+defineArgs("key", "path", "allowExt", "output");
 
-const search = args[0]?.replace("key=", "");
-const path = args[1]?.replace("path=", "");
-const allowExt = args[2]?.replace("allowExt=", "");
-const output = args[3]?.replace("output=", "");
+const search = key;
 
 if (search == "" || !search) {
   throw new Error("Parameter search tidak boleh kosong!");
@@ -38,45 +29,47 @@ const init = async (path, allowExt, search) => {
   // Ambil file include
   await walkRead(path, allowExt, search, data);
 
-  const localPath = dirname(fileURLToPath(import.meta.url));
-  let exportedPath = localPath + "/exported";
-  let isDirExist = fs.existsSync(exportedPath);
-
-  // jika belum ada buat direktori baru
-  if (!isDirExist) {
-    fs.mkdirSync(exportedPath);
-  }
-
-  // Hanya mapping path
-  const paths = data
-    .map((v) => {
-      return v.path;
-    })
-    .join("\n");
-
-  if (output) {
-    exportedPath = exportedPath + "/" + output;
-  } else {
-    exportedPath =
-      exportedPath +
-      `/${search}_${(Math.random() + 1).toString(36).substring(7)}`;
-  }
-
-  isDirExist = fs.existsSync(exportedPath);
-
-  if (!isDirExist) {
-    await fs.promises.mkdir(exportedPath);
-    fs.writeFileSync(
-      exportedPath + "/detail.json",
-      JSON.stringify(data, null, 2)
-    );
-    fs.writeFileSync(exportedPath + "/path.txt", paths);
-  }
-
   if (data.length > 0) {
-    console.info(chalk.green("Successfully exported " + data.length + " line"));
+    const localPath = dirname(fileURLToPath(import.meta.url));
+    let exportedPath = localPath + "/exported";
+    let isDirExist = fs.existsSync(exportedPath);
+
+    // jika belum ada buat direktori baru
+    if (!isDirExist) {
+      fs.mkdirSync(exportedPath);
+    }
+
+    // Hanya mapping path
+    const paths = data
+      .map((v) => {
+        return v.path;
+      })
+      .join("\n");
+
+    if (output) {
+      exportedPath = exportedPath + "/" + output;
+    } else {
+      exportedPath =
+        exportedPath +
+        `/${search}_${(Math.random() + 1).toString(36).substring(7)}`;
+    }
+
+    isDirExist = fs.existsSync(exportedPath);
+
+    if (!isDirExist) {
+      await fs.promises.mkdir(exportedPath);
+      fs.writeFileSync(
+        exportedPath + "/detail.json",
+        JSON.stringify(data, null, 2)
+      );
+      fs.writeFileSync(exportedPath + "/path.txt", paths);
+    }
+
+    print.success(
+      "\n\nSuccessfully exported " + data.length + " line to " + exportedPath
+    );
   } else {
-    console.warning(chalk.yellow("Index not found!"));
+    print.warn("\nKey didn't match!");
   }
 };
 
@@ -94,8 +87,8 @@ const walkRead = async (path, allowExt, search, exported) => {
       const extName = extname(originalPath);
       // Jika file extension sesuai
       if (extName.includes(allowExt) && extName !== "") {
-        console.info(
-          chalk.blue("Found index in " + filePath.replace("../", ""))
+        printProgress(
+          chalk.blue("Analyze file " + filePath.replace("../", ""))
         );
 
         const fileStream = fs.createReadStream(filePath);
