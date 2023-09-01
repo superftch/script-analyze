@@ -2,6 +2,12 @@ import chalk from "chalk";
 
 /**
  *
+ * @return {void}
+ */
+global.clearln = () => process.stdout.write("\x1Bc");
+
+/**
+ *
  * @param {string} text
  * @return {void}
  */
@@ -88,4 +94,15 @@ export const defineArgs = (...args) => {
   });
 
   return result;
+};
+
+/**
+ *
+ * @param {Array<Object>} args
+ * @return {void}
+ */
+export const exportGlobalHelper = (...args) => {
+  args.forEach((arg) => {
+    eval(`global.${arg} = ${arg}`);
+  });
 };

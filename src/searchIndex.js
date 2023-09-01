@@ -3,7 +3,6 @@ import * as fs from "fs";
 import { dirname, extname, join } from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
-import { defineArgs, print, printProgress } from "./helper.js";
 
 /**
  *
@@ -130,11 +129,9 @@ const walkRead = async (path, allowExt, search, exported) => {
 };
 
 export const initialize = () => {
-  process.stdout.write("\x1Bc");
+  clearln()
 
   defineArgs("!key", "!path", "!allowExt", "output");
 
-  const search = key;
-  
-  execute(path, allowExt, search);
+  execute(path, allowExt, key);
 };

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { program } from "commander";
 import * as search from "./src/searchIndex.js";
+import { exportGlobalHelper } from "./src/helper.js";
+
+exportGlobalHelper("print", "defineArgs", "printProgress");
 
 const version = "1.0.0";
 
