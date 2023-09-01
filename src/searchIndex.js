@@ -5,12 +5,6 @@ import readline from "readline";
 import { fileURLToPath } from "url";
 import { defineArgs, print, printProgress } from "./helper.js";
 
-process.stdout.write("\x1Bc");
-
-defineArgs("!key", "!path", "!allowExt", "output");
-
-const search = key;
-
 /**
  *
  * @param {string} path
@@ -136,5 +130,11 @@ const walkRead = async (path, allowExt, search, exported) => {
 };
 
 export const initialize = () => {
+  process.stdout.write("\x1Bc");
+
+  defineArgs("!key", "!path", "!allowExt", "output");
+
+  const search = key;
+  
   execute(path, allowExt, search);
 };
