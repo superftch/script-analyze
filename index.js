@@ -13,13 +13,11 @@ const version = "1.0.0";
 
 program.version(version);
 
-// Pencarian file yang include dengan kata kunci
+// Pencarian kata kunci dalam file
 program
   .command("search")
-  .description("Cari file yang include dengan kata kunci")
+  .description("Cari kata kunci yang include dalam file")
   .option("--withRoute")
-  .action(() => {
-    search.start();
-  });
+  .action(search.start);
 
 program.parse(process.argv);

@@ -60,20 +60,20 @@ const execute = async (search, path, allowExt, opts = {}) => {
 
     if (!isDirExist) {
       await fs.promises.mkdir(exportedPath);
+    }
 
-      // Export data berupa json
-      fs.writeFileSync(
-        exportedPath + "/detail.json",
-        JSON.stringify(data, null, 2)
-      );
+    // Export data berupa json
+    fs.writeFileSync(
+      exportedPath + "/detail.json",
+      JSON.stringify(data, null, 2)
+    );
 
-      // Export data berupa text
-      fs.writeFileSync(exportedPath + "/file.txt", paths);
+    // Export data berupa text
+    fs.writeFileSync(exportedPath + "/file.txt", paths);
 
-      // Export data routing text jika withRoute bernilai true
-      if (opts.withRoute) {
-        fs.writeFileSync(exportedPath + "/routes.txt", routes);
-      }
+    // Export data routing text jika withRoute bernilai true
+    if (opts.withRoute) {
+      fs.writeFileSync(exportedPath + "/routes.txt", routes);
     }
 
     print.success("\n\nSuccessfully exported file to " + exportedPath);
