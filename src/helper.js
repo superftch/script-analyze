@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { join } from "path";
 
 /**
  *
@@ -101,9 +102,7 @@ export const defineArgs = async (...args) => {
 
         result[arg] = value || "";
         global[arg] = value;
-        !isOptions
-          ? print.default(arg + ": " + value)
-          : optLists.push(`--${arg}`);
+        !isOptions ? print.default(arg + ": " + value) : optLists.push(`--${arg}`);
       }
     }
 
@@ -137,7 +136,7 @@ export const extractRoute = (path) => {
     let isFile = splittedMatch[0]?.split(".").length > 1;
 
     if (isFile) {
-      const extractedPath = path.substring(0, index) + "/" + match[1];
+      const extractedPath = join(path.substring(0, index), match[1]);
       let pathLists = extractedPath.split("/");
       // Hapus path paling depan
       pathLists = pathLists

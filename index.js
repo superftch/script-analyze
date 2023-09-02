@@ -18,6 +18,7 @@ program
   .command("search")
   .description("Cari kata kunci yang include dalam file")
   .option("--withRoute")
+  .option("--strict")
   .action(search.start);
 
 program.parse(process.argv);

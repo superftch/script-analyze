@@ -49,11 +49,12 @@ const execute = async (search, path, allowExt, opts = {}) => {
 
     // Buat direktori baru
     if (output) {
-      exportedPath = exportedPath + "/" + output;
+      exportedPath = join(exportedPath, output);
     } else {
-      exportedPath =
-        exportedPath +
-        `/${search}_${(Math.random() + 1).toString(36).substring(7)}`;
+      exportedPath = join(
+        exportedPath,
+        `${search}_${(Math.random() + 1).toString(36).substring(7)}`,
+      );
     }
 
     isDirExist = fs.existsSync(exportedPath);
@@ -63,10 +64,7 @@ const execute = async (search, path, allowExt, opts = {}) => {
     }
 
     // Export data berupa json
-    fs.writeFileSync(
-      exportedPath + "/detail.json",
-      JSON.stringify(data, null, 2)
-    );
+    fs.writeFileSync(exportedPath + "/detail.json", JSON.stringify(data, null, 2));
 
     // Export data berupa text
     fs.writeFileSync(exportedPath + "/file.txt", paths);
@@ -101,7 +99,7 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
   const filePaths = fs.readdirSync(path);
   for await (let filePath of filePaths) {
     const originalPath = filePath;
-    filePath = path + "/" + filePath;
+    filePath = join(path, filePath);
     const isDirectory = fs.lstatSync(filePath).isDirectory();
     // Jika directory maka panggil recursive
     if (isDirectory) {
@@ -111,9 +109,7 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
       const extName = extname(originalPath);
       // Jika file extension sesuai
       if (extName.includes(allowExt) && extName !== "") {
-        printProgress(
-          chalk.blue("Analyze file " + filePath.replace("../", ""))
-        );
+        printProgress(chalk.blue("Analyze file " + filePath.replace("../", "")));
 
         // Baca file
         const fileStream = fs.createReadStream(filePath);
@@ -144,8 +140,19 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
 
         // Mulai melakukan pencarian perbaris
         for await (const line of lines) {
+          // Pencarian strict atau tidak
+          let match = false;
+          if (opts.strict) {
+            const escapedSearch = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+            const pattern = new RegExp(`\\b${escapedSearch}\\b`, "gi");
+            match = line.match(pattern);
+          } else {
+            match = line.toLowerCase().includes(search.toLowerCase());
+          }
+
           // Hanya ambil yang sesuai pencarian
-          if (line.toLowerCase().includes(search.toLowerCase())) {
+          if (match) {
             const detail = {};
             detail.line = index;
             detail.search = search;
@@ -170,8 +177,8 @@ export const start = async () => {
   clearln();
 
   // Definisikan argumen
-  await defineArgs("!key", "!path", "!allowExt", "output", "--withRoute");
+  await defineArgs("!key", "!path", "!allowExt", "output", "--withRoute", "--strict");
 
   // Jalankan fungsi utama
-  execute(key, path, allowExt, { withRoute });
+  execute(key, path, allowExt, { withRoute, strict });
 };
