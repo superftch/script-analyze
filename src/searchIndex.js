@@ -98,6 +98,16 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
 
   const filePaths = fs.readdirSync(path);
   for await (let filePath of filePaths) {
+    let isExceptedPath =
+      configs.excepts?.filter((value) => {
+        return join(path, filePath).split("/").includes(value);
+      })?.length > 0;
+
+    // Jika path terdaftar di except config maka skip
+    if (isExceptedPath) {
+      continue;
+    }
+
     const originalPath = filePath;
     filePath = join(path, filePath);
     const isDirectory = fs.lstatSync(filePath).isDirectory();
