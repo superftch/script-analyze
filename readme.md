@@ -1,6 +1,6 @@
 # Script Analyze
 
-Tool untuk menganalisa kode seperti mencara index kata kunci yang diinclude dalam kode.
+Tool untuk menganalisa kode seperti mencari index kata kunci yang diinclude dalam kode.
 
 ## 🚀 Konfigurasi
 
