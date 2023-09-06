@@ -3,6 +3,7 @@ import * as fs from "fs";
 import { dirname, extname, join } from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
+import { spreadsheet, writeAfterIndex } from "./gsheet.js";
 
 /**
  *
@@ -31,11 +32,9 @@ const execute = async (search, path, allowExt, opts = {}) => {
     }
 
     // Hanya mapping path
-    const paths = data
-      .map((v) => {
-        return v.path;
-      })
-      .join("\n");
+    const paths = data.map((v) => {
+      return v.path;
+    });
 
     // Hanya mapping routes
     const routes = data
@@ -44,9 +43,8 @@ const execute = async (search, path, allowExt, opts = {}) => {
       })
       ?.map((v) => {
         return v.route;
-      })
-      ?.join("\n");
-
+      });
+      
     // Buat direktori baru
     if (output) {
       exportedPath = join(exportedPath, output);
@@ -67,14 +65,36 @@ const execute = async (search, path, allowExt, opts = {}) => {
     fs.writeFileSync(exportedPath + "/detail.json", JSON.stringify(data, null, 2));
 
     // Export data berupa text
-    fs.writeFileSync(exportedPath + "/file.txt", paths);
+    fs.writeFileSync(exportedPath + "/file.txt", paths?.join("\n"));
 
     // Export data routing text jika withRoute bernilai true
     if (opts.withRoute) {
-      fs.writeFileSync(exportedPath + "/routes.txt", routes);
+      fs.writeFileSync(exportedPath + "/routes.txt", routes?.join("\n"));
     }
 
     print.success("\n\nSuccessfully exported file to " + exportedPath);
+
+    if (opts.exportToSheet && configs.google_private_key) {
+      try {
+        print.info("\nExporting to google sheet..");
+        const doc = await spreadsheet();
+        const sheetId = doc.sheetsByTitle[output].sheetId;
+        const sheet = doc.sheetsById[sheetId];
+        await sheet.loadCells("A1:Z");
+        const ranges = await sheet.getCellsInRange("A1:Z");
+
+        // Export path ke spreadsheet
+        await writeAfterIndex(configs.gsheet.exported.file, sheet, ranges, paths);
+
+        // Export route ke spreadsheet
+        await writeAfterIndex(configs.gsheet.exported.route, sheet, ranges, routes);
+
+        // Simpan perubahan data
+        await sheet.saveUpdatedCells();
+      } catch (error) {
+        print.error(error);
+      }
+    }
   } else {
     print.warn("\nKey didn't match!");
   }
@@ -187,8 +207,16 @@ export const start = async () => {
   clearln();
 
   // Definisikan argumen
-  await defineArgs("!key", "!path", "!allowExt", "output", "--withRoute", "--strict");
+  await defineArgs(
+    "!key",
+    "!path",
+    "!allowExt",
+    "output",
+    "--withRoute",
+    "--strict",
+    "--exportToSheet",
+  );
 
   // Jalankan fungsi utama
-  execute(key, path, allowExt, { withRoute, strict });
+  execute(key, path, allowExt, { withRoute, strict, exportToSheet });
 };

@@ -5,7 +5,8 @@ import { join } from "path";
  *
  * @return {void}
  */
-global.clearln = () => process.stdout.write("\x1Bc");
+global.clearln = () =>
+  process.platform === "win32" ? console.clear() : process.stdout.write("\x1Bc");
 
 /**
  *
@@ -13,9 +14,13 @@ global.clearln = () => process.stdout.write("\x1Bc");
  * @return {void}
  */
 export const printProgress = (text) => {
-  process.stdout.clearLine(0);
-  process.stdout.cursorTo(0);
-  process.stdout.write(text);
+  if (process.platform === "win32") {
+    console.log(text);
+  } else {
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write(text);
+  }
 };
 
 export const print = {
