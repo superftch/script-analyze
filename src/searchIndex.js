@@ -188,7 +188,13 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
             if (opts.strict) {
               const escapedSearch = searchVal.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
 
-              const pattern = new RegExp(`\\b${escapedSearch}\\b`, "gi");
+              let pattern;
+              if (!searchVal.includes("(")) {
+                pattern = new RegExp(`\\b${escapedSearch}\\b`, "gi");
+              } else {
+                pattern = new RegExp(`${escapedSearch}`, "gi");
+              }
+
               match = line.match(pattern);
             } else {
               match = line.toLowerCase().includes(searchVal.toLowerCase());
