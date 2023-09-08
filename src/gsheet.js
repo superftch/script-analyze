@@ -24,10 +24,7 @@ export const writeAfterIndex = async (key, sheet, ranges, data) => {
   let { y, x } = filterRange(key, ranges);
   let row = y + 1;
   for await (let value of data) {
-    // Write cell jika kosong
-    if (sheet.getCell(row, x).value == null) {
-      sheet.getCell(row, x).value = value;
-    }
+    sheet.getCell(row, x).value = value;
     row++;
   }
 };

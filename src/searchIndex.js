@@ -62,7 +62,18 @@ const execute = async (search, path, allowExt, opts = {}) => {
     }
 
     // Export data berupa json
-    fs.writeFileSync(exportedPath + "/detail.json", JSON.stringify(data, null, 2));
+    fs.writeFileSync(
+      exportedPath + "/detail.json",
+      JSON.stringify(
+        {
+          searchIndex: search,
+          searchOptions: opts,
+          data,
+        },
+        null,
+        2,
+      ),
+    );
 
     // Export data berupa text
     fs.writeFileSync(exportedPath + "/file.txt", paths?.join("\n"));
