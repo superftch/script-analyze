@@ -44,7 +44,7 @@ const execute = async (search, path, allowExt, opts = {}) => {
       ?.map((v) => {
         return v.route;
       });
-      
+
     // Buat direktori baru
     if (output) {
       exportedPath = join(exportedPath, output);
@@ -170,24 +170,38 @@ const walkRead = async (search, path, allowExt, exported, opts) => {
 
         // Mulai melakukan pencarian perbaris
         for await (const line of lines) {
-          // Pencarian strict atau tidak
-          let match = false;
-          if (opts.strict) {
-            const escapedSearch = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+          // Pencarian multi
+          let searchValues = [];
+          const matches = [...search.matchAll(/{{(.*?)}}/g)];
 
-            const pattern = new RegExp(`\\b${escapedSearch}\\b`, "gi");
-            match = line.match(pattern);
+          const multiSearchValue = matches.map((match) => match[1]);
+
+          if (multiSearchValue.length > 0) {
+            searchValues = multiSearchValue;
           } else {
-            match = line.toLowerCase().includes(search.toLowerCase());
+            searchValues = [search];
           }
 
-          // Hanya ambil yang sesuai pencarian
-          if (match) {
-            const detail = {};
-            detail.line = index;
-            detail.search = search;
-            detail.content = line.trim();
-            data.details.push(detail);
+          for (const searchVal of searchValues) {
+            // Pencarian strict atau tidak
+            let match = false;
+            if (opts.strict) {
+              const escapedSearch = searchVal.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+              const pattern = new RegExp(`\\b${escapedSearch}\\b`, "gi");
+              match = line.match(pattern);
+            } else {
+              match = line.toLowerCase().includes(searchVal.toLowerCase());
+            }
+
+            // Hanya ambil yang sesuai pencarian
+            if (match) {
+              const detail = {};
+              detail.line = index;
+              detail.search = searchVal;
+              detail.content = line.trim();
+              data.details.push(detail);
+            }
           }
 
           index++;
