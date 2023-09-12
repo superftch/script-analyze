@@ -9,7 +9,7 @@
   "preferGlobal": true,
   "scripts": {
     "search": "node index.js",
-    "postinstall": "npm link"
+    "postinstall": "node postinstall.js"
   },
   "keywords": [],
   "author": "",
